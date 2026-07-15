@@ -1,7 +1,11 @@
+import AppKit
 import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var manager: BrightnessManager
+    @State private var isEditingNits = false
+    @State private var nitsDraft = ""
+    @FocusState private var nitsFieldFocused: Bool
 
     var body: some View {
         VStack(spacing: 0) {
@@ -33,6 +37,11 @@ struct ContentView: View {
         .padding(.top, 20)
         .padding(.bottom, 8)
         .frame(width: 300)
+        .onAppear {
+            // Screens may have changed (or launch-time detection may have
+            // run too early) — re-check every time the popover opens.
+            manager.checkEDRSupport()
+        }
     }
 
     // MARK: - Header
@@ -109,12 +118,27 @@ struct ContentView: View {
 
     private var nitsDisplay: some View {
         HStack(alignment: .lastTextBaseline, spacing: 4) {
-            Text(formattedNits)
-                .font(.system(size: 42, weight: .light, design: .rounded))
-                .monospacedDigit()
-                .foregroundColor(.primary)
-                .contentTransition(.numericText())
-                .animation(.easeInOut(duration: 0.15), value: manager.currentNits)
+            if isEditingNits {
+                TextField("", text: $nitsDraft)
+                    .font(.system(size: 42, weight: .light, design: .rounded))
+                    .monospacedDigit()
+                    .multilineTextAlignment(.trailing)
+                    .textFieldStyle(.plain)
+                    .frame(width: 150)
+                    .focused($nitsFieldFocused)
+                    .onSubmit { finishEditingNits(commit: true) }
+                    .onReceive(NotificationCenter.default.publisher(for: NSControl.textDidEndEditingNotification)) { _ in
+                        finishEditingNits(commit: true)
+                    }
+            } else {
+                Text(formattedNits)
+                    .font(.system(size: 42, weight: .light, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundColor(.primary)
+                    .contentTransition(.numericText())
+                    .animation(.easeInOut(duration: 0.15), value: manager.currentNits)
+                    .onTapGesture { startEditingNits() }
+            }
 
             Text("nits")
                 .font(.system(size: 16, weight: .regular))
@@ -130,6 +154,25 @@ struct ContentView: View {
         return formatter.string(from: NSNumber(value: manager.currentNits)) ?? "\(manager.currentNits)"
     }
 
+    private func startEditingNits() {
+        guard manager.isEDRSupported else { return }
+        nitsDraft = "\(manager.currentNits)"
+        isEditingNits = true
+        nitsFieldFocused = true
+    }
+
+    private func finishEditingNits(commit: Bool) {
+        guard isEditingNits else { return }
+        if commit {
+            let value = nitsDraft.replacingOccurrences(of: ",", with: "")
+            if let nits = Double(value) {
+                manager.setNits(nits)
+            }
+        }
+        isEditingNits = false
+        nitsFieldFocused = false
+    }
+
     // MARK: - Slider
 
     private var sliderSection: some View {
@@ -140,7 +183,9 @@ struct ContentView: View {
 
             Slider(
                 value: $manager.brightnessMultiplier,
-                in: 1.0...manager.maxMultiplier
+                // Guard against a zero-width range (crashes SwiftUI) when
+                // no EDR display is detected (maxMultiplier == 1.0).
+                in: 1.0...max(manager.maxMultiplier, 1.01)
             )
             .tint(Color.accentAmber)
             .disabled(!manager.isEnabled)

@@ -1,9 +1,8 @@
 import MetalKit
 
-/// Minimal Metal renderer that fills the drawable with an EDR clear color.
-/// No custom shaders needed — the clearColor mechanism fills the entire
-/// drawable, and the "multiply" compositing filter on the window's layer
-/// blends it with the screen content to boost brightness.
+/// Minimal Metal renderer that keeps a tiny HDR drawable alive.
+/// The display brightness lift comes from the gamma table in OverlayManager;
+/// this view just lets macOS accept extended-range output.
 final class MetalRenderer: NSObject, MTKViewDelegate {
     private let commandQueue: MTLCommandQueue
 
@@ -27,8 +26,8 @@ final class MetalRenderer: NSObject, MTKViewDelegate {
 
         super.init()
 
-        // Set the initial clear color to the brightness value
-        // In extendedLinearDisplayP3 color space, values > 1.0 activate EDR
+        // Set the initial clear color to the brightness value.
+        // Values > 1.0 keep the tiny seed window in HDR/EDR mode.
         mtkView.clearColor = MTLClearColor(
             red: brightness, green: brightness, blue: brightness, alpha: 1.0
         )
