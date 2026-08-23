@@ -132,9 +132,7 @@ final class BrightnessManager: ObservableObject {
         stopWatchdog()
         watchdogTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
             guard let self = self, self.isEnabled else { return }
-            if !self.overlayManager.checkOverlaysAlive() {
-                self.overlayManager.rebuildOverlays(brightness: self.brightnessMultiplier)
-            }
+            self.overlayManager.keepOverlaysVisible()
         }
     }
 
