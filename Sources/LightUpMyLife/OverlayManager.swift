@@ -24,7 +24,6 @@ final class OverlayManager {
         hideOverlays()
 
         guard let device = device else { return }
-        CGDisplayRestoreColorSyncSettings()
         generation += 1
         let currentGeneration = generation
 
@@ -79,10 +78,10 @@ final class OverlayManager {
         showOverlays(brightness: brightness)
     }
 
-    /// Check if all overlay windows are still visible (macOS can kill them after sleep)
-    func checkOverlaysAlive() -> Bool {
-        guard !overlayWindows.isEmpty else { return false }
-        return overlayWindows.values.allSatisfy { $0.isVisible }
+    func keepOverlaysVisible() {
+        overlayWindows.values
+            .filter { !$0.isVisible }
+            .forEach { $0.orderFrontRegardless() }
     }
 
     private func createOverlayWindow(for screen: NSScreen) -> NSWindow {

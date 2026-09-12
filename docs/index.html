@@ -7,13 +7,13 @@
 
     <!-- Primary Meta Tags -->
     <meta name="title" content="Light Up My Life — Free XDR Brightness for macOS">
-    <meta name="description" content="Unlock the full 1,600 nit brightness of your MacBook Pro XDR display. Free, open-source, no subscription. A free alternative to Vivid.">
+    <meta name="description" content="Boost your MacBook Pro XDR display beyond standard brightness. Free, open-source, no subscription. A free alternative to Vivid.">
 
     <!-- Open Graph / Facebook / iMessage / Slack -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ben4mn.github.io/light-up-my-life/">
     <meta property="og:title" content="Light Up My Life — Free XDR Brightness for macOS">
-    <meta property="og:description" content="Unlock the full 1,600 nit brightness of your MacBook Pro XDR display. Free & open-source. No subscription.">
+    <meta property="og:description" content="Boost your MacBook Pro XDR display beyond standard brightness. Free & open-source. No subscription.">
     <meta property="og:image" content="https://ben4mn.github.io/light-up-my-life/social-card.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -22,7 +22,7 @@
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://ben4mn.github.io/light-up-my-life/">
     <meta property="twitter:title" content="Light Up My Life — Free XDR Brightness for macOS">
-    <meta property="twitter:description" content="Unlock 1,600 nits on your MacBook Pro. Free & open-source alternative to Vivid.">
+    <meta property="twitter:description" content="Extra XDR brightness for your MacBook Pro. Free & open-source alternative to Vivid.">
     <meta property="twitter:image" content="https://ben4mn.github.io/light-up-my-life/social-card.png">
 
     <!-- Canonical & SEO -->
@@ -45,7 +45,7 @@
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "Light Up My Life",
-      "description": "Unlock the full 1,600 nit brightness of your MacBook Pro XDR display. Free, open-source alternative to Vivid.",
+      "description": "Boost your MacBook Pro XDR display beyond standard brightness. Free, open-source alternative to Vivid.",
       "operatingSystem": "macOS 13.0+",
       "applicationCategory": "UtilitiesApplication",
       "softwareVersion": "1.0.0",
@@ -414,8 +414,8 @@
             <h1>Light Up My Life</h1>
             <p class="hero-subtitle">XDR Brightness</p>
             <p class="hero-desc">
-                Your MacBook Pro can hit <strong>1,600 nits</strong>. macOS only gives you 500.
-                This app unlocks the rest.
+                Boost your MacBook Pro's <strong>XDR display</strong> beyond standard brightness.
+                The nits readout is an estimate, not a measurement.
             </p>
             <div class="cta-group">
                 <a href="https://github.com/ben4mn/light-up-my-life/releases" class="btn btn-primary">
@@ -432,7 +432,7 @@
         <section class="nits-section">
             <div class="nits-card">
                 <div class="nits-value">1,600</div>
-                <div class="nits-label">nits</div>
+                <div class="nits-label">estimated nits</div>
                 <div class="nits-slider">
                     <div class="nits-slider-fill"></div>
                     <div class="nits-slider-thumb"></div>
@@ -454,8 +454,8 @@
             <div class="feature-grid">
                 <div class="feature-card">
                     <div class="feature-icon">&#9728;&#65039;</div>
-                    <h3>Full XDR Brightness</h3>
-                    <p>Boost from 500 to 1,600 nits with a simple slider. Perfect for outdoor use or bright rooms.</p>
+                    <h3>Adjustable XDR Brightness</h3>
+                    <p>Use the slider or click the app's nits value to edit. The estimate is 500 &times; the multiplier, capped by available EDR headroom and at 1,600 nits; it is not measured luminance.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">&#9881;&#65039;</div>
@@ -480,7 +480,7 @@
                 <div class="feature-card">
                     <div class="feature-icon">&#128187;</div>
                     <h3>Multi-Display</h3>
-                    <p>Works across all connected XDR displays. Non-XDR monitors are skipped automatically.</p>
+                    <p>Detects all EDR-capable displays, even when the main monitor is SDR. Standard monitors are skipped automatically.</p>
                 </div>
             </div>
         </section>
@@ -489,32 +489,39 @@
         <section class="how-it-works">
             <h2>How it works</h2>
             <p class="desc">
-                Light Up My Life uses Apple's Metal framework to activate your display's
-                Extended Dynamic Range (EDR) mode &mdash; the same technology used for HDR video,
-                applied system-wide.
+                Light Up My Life saves each EDR-capable display's gamma tables, activates
+                Extended Dynamic Range with a tiny Metal HDR window, then scales the saved
+                tables to brighten desktop content. No full-screen overlay or multiply filter.
             </p>
             <div class="steps">
                 <div class="step">
                     <div class="step-num">1</div>
-                    <h3>Metal Overlay</h3>
-                    <p>Transparent window covers your screen</p>
+                    <h3>Save Gamma</h3>
+                    <p>Capture the display's current RGB gamma tables</p>
                 </div>
                 <div class="step">
                     <div class="step-num">2</div>
-                    <h3>EDR Color Space</h3>
-                    <p>Extended linear P3 unlocks values above 1.0</p>
+                    <h3>Tiny HDR Seed</h3>
+                    <p>A 5&times;5-point click-through window in the corner</p>
                 </div>
                 <div class="step">
                     <div class="step-num">3</div>
-                    <h3>Multiply Blend</h3>
-                    <p>Boosts your content without washing it out</p>
+                    <h3>HDR Rendering</h3>
+                    <p>Display P3 PQ and floating-point color values above 1.0</p>
                 </div>
                 <div class="step">
                     <div class="step-num">4</div>
-                    <h3>Full Brightness</h3>
-                    <p>Display activates XDR mode at up to 1,600 nits</p>
+                    <h3>Gamma Boost</h3>
+                    <p>Scale the saved tables to brighten desktop content</p>
                 </div>
             </div>
+            <p class="desc">
+                Turning boost off or quitting normally restores the saved gamma tables.
+                Wake and display changes rebuild the HDR windows and reapply the boost;
+                a three-second watchdog re-shows existing hidden windows without rebuilding them.
+                The seed windows can appear in screenshots or screen recordings &mdash;
+                read-only window sharing does not exclude them from capture.
+            </p>
         </section>
         </main>
 

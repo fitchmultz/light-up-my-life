@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Unlock the full brightness of your MacBook Pro XDR display.</strong><br>
-  Free & open-source. Up to 1,600 nits. No subscription. No nonsense.
+  Free & open-source. Extra XDR brightness. No subscription. No nonsense.
 </p>
 
 <p align="center">
@@ -30,12 +30,12 @@
 <br>
 
 <h3 align="center">
-  500 nits &#8594; 1,600 nits
+  500 &#8594; 1,600 estimated nits
 </h3>
 
 <p align="center">
-  Your MacBook Pro's XDR display can go <strong>3x brighter</strong> than macOS allows.<br>
-  This app flips the switch.
+  Boost your MacBook Pro's XDR display beyond standard brightness.<br>
+  The nits readout is an estimate, not a measurement.
 </p>
 
 <br>
@@ -55,7 +55,7 @@ Your MacBook Pro has an XDR display capable of **1,600 nits** of brightness — 
 | Feature | Light Up My Life | Vivid | BrightIntosh |
 |---|:---:|:---:|:---:|
 | **Price** | **Free** | $20+ | Free |
-| **Max Brightness** | 1,600 nits | 1,600 nits | 1,600 nits |
+| **Max Brightness** | 1,600 estimated nits | 1,600 nits | 1,600 nits |
 | **Brightness Slider** | Yes | Yes | Yes |
 | **Menu Bar App** | Yes | Yes | Yes |
 | **Multi-Display** | Yes | Yes | No |
@@ -66,14 +66,14 @@ Your MacBook Pro has an XDR display capable of **1,600 nits** of brightness — 
 
 ## Features
 
-- **Full XDR Brightness** — boost from 500 to 1,600 nits
+- **XDR Brightness** — boost EDR-capable displays, with a control range capped at 1,600 estimated nits
 - **Menu Bar App** — lives quietly in your menu bar, no dock icon
 - **Brightness Slider** — fine-grained control over your boost level
-- **Live Nits Display** — see exactly how bright your screen is
+- **Editable Nits Estimate** — click the nits value to enter a level; it is calculated from the boost setting, not measured luminance
 - **Click the Sun** — tap the sun icon or the toggle to switch on/off
 - **Remembers Your Settings** — persists brightness level between launches
 - **Sleep/Wake Aware** — automatically re-applies after your Mac wakes up
-- **Multi-Display** — works across all connected XDR displays
+- **Multi-Display** — detects all EDR-capable displays, even when the main monitor is SDR
 - **Lightweight** — minimal CPU/GPU usage (~10 FPS solid color render)
 - **No Permissions Needed** — no accessibility access, no admin privileges
 
@@ -124,16 +124,18 @@ swift build -c release
 
 ## How It Works
 
-Light Up My Life uses a transparent [Metal](https://developer.apple.com/metal/) overlay window to activate your display's Extended Dynamic Range (EDR) mode:
+Light Up My Life combines a tiny [Metal](https://developer.apple.com/metal/) HDR window with per-display gamma adjustments to brighten desktop content:
 
-1. A borderless, click-through window covers your screen
-2. A `CAMetalLayer` renders in the `extendedLinearDisplayP3` color space
-3. Color values above 1.0 tell the display to exceed standard brightness
-4. A `multiply` compositing filter blends the boost with your screen content
+1. Save each EDR-capable display's current RGB gamma tables before making changes
+2. Place a 5×5-point, borderless, click-through HDR seed window in the corner of each eligible display
+3. Render values above 1.0 in the `displayP3_PQ` color space with a floating-point `CAMetalLayer` to activate Extended Dynamic Range (EDR)
+4. Scale the saved gamma tables to apply the boost — no full-screen window or `multiply` filter
 
-This is the same mechanism your display uses for HDR video — we just apply it system-wide.
+The nits readout is `500 × brightness multiplier`, rounded to an integer. Click it to edit the level, or use the slider. The control range follows available EDR headroom and is capped at 3.2× (1,600 estimated nits); actual luminance depends on your display and macOS and is not measured by the app.
 
-The overlay is invisible to screenshots (won't appear in screen recordings), doesn't intercept mouse events, and works across all Spaces and fullscreen apps.
+Turning boost off or quitting normally restores the saved gamma tables. Wake and display changes rebuild the HDR windows and reapply the boost; the three-second watchdog only re-shows existing hidden windows, without rebuilding them. Displays without EDR support are skipped, and gamma is only changed when a table was successfully saved.
+
+The seed windows ignore mouse events and are configured for all Spaces and fullscreen apps. They use `.readOnly` window sharing, so they can appear in screenshots or screen recordings; capture exclusion is not guaranteed.
 
 ## FAQ
 
@@ -173,14 +175,14 @@ Only on displays that support EDR (like the Pro Display XDR). Standard external 
 
 ## Contributing
 
-PRs welcome! The codebase is intentionally small (~550 lines) and simple:
+PRs welcome! The codebase is intentionally small and simple:
 
 ```
 Sources/LightUpMyLife/
 ├── LightUpMyLifeApp.swift   # App entry point (MenuBarExtra)
 ├── ContentView.swift        # Popover UI
 ├── BrightnessManager.swift  # State management & notifications
-├── OverlayManager.swift     # Metal overlay windows
+├── OverlayManager.swift     # HDR seed windows & gamma tables
 ├── MetalRenderer.swift      # EDR clear-color renderer
 └── CustomStyles.swift       # Amber toggle style
 ```
