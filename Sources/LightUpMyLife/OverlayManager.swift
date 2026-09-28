@@ -13,6 +13,7 @@ final class OverlayManager {
     private var overlayWindows: [NSScreen: NSWindow] = [:]
     private var renderers: [NSWindow: MetalRenderer] = [:]
     private var originalGammaTables: [CGDirectDisplayID: GammaTable] = [:]
+    private var overlayLayout: [CGDirectDisplayID: NSRect] = [:]
     private var generation = 0
     private let device: MTLDevice?
 
@@ -28,13 +29,7 @@ final class OverlayManager {
         generation += 1
         let currentGeneration = generation
 
-        for screen in NSScreen.screens {
-            // Only create overlays for EDR-capable screens
-            guard screen.maximumPotentialExtendedDynamicRangeColorComponentValue > 1.0,
-                  let displayID = screen.displayID else {
-                continue
-            }
-
+        for (screen, displayID) in edrScreens() {
             saveGammaTable(for: displayID)
 
             let window = createOverlayWindow(for: screen)
@@ -44,6 +39,7 @@ final class OverlayManager {
 
             overlayWindows[screen] = window
             renderers[window] = renderer
+            overlayLayout[displayID] = screen.frame
 
             window.orderFrontRegardless()
         }
@@ -64,6 +60,7 @@ final class OverlayManager {
         }
         overlayWindows.removeAll()
         renderers.removeAll()
+        overlayLayout.removeAll()
         restoreGammaTables()
     }
 
@@ -74,15 +71,31 @@ final class OverlayManager {
         applyGammaToVisibleDisplays(brightness: brightness)
     }
 
-    func rebuildOverlays(brightness: Double) {
-        hideOverlays()
-        showOverlays(brightness: brightness)
+    /// Screen-parameter notifications also fire whenever EDR headroom changes
+    /// (every SDR brightness step), so only rebuild when the EDR display layout
+    /// actually changed. Rebuilding drops the gamma boost and flickers.
+    func refreshOverlays(brightness: Double) {
+        let layout = Dictionary(uniqueKeysWithValues: edrScreens().map { ($0.1, $0.0.frame) })
+        guard layout == overlayLayout else {
+            showOverlays(brightness: brightness)
+            return
+        }
+        keepOverlaysVisible()
+        applyGammaToVisibleDisplays(brightness: brightness)
     }
 
     func keepOverlaysVisible() {
         overlayWindows.values
             .filter { !$0.isVisible }
             .forEach { $0.orderFrontRegardless() }
+    }
+
+    private func edrScreens() -> [(NSScreen, CGDirectDisplayID)] {
+        NSScreen.screens.compactMap { screen in
+            guard screen.maximumPotentialExtendedDynamicRangeColorComponentValue > 1.0,
+                  let displayID = screen.displayID else { return nil }
+            return (screen, displayID)
+        }
     }
 
     private func createOverlayWindow(for screen: NSScreen) -> NSWindow {
