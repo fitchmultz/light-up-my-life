@@ -517,7 +517,9 @@
             </div>
             <p class="desc">
                 Turning boost off or quitting normally restores the saved gamma tables.
-                Wake and display changes rebuild the HDR windows and reapply the boost;
+                Wake and EDR display-layout changes rebuild the HDR windows and reapply the boost.
+                Headroom-only changes reuse the existing windows and reapply gamma, avoiding
+                rebuild-induced flicker during ordinary brightness changes;
                 a three-second watchdog re-shows existing hidden windows without rebuilding them.
                 The seed windows can appear in screenshots or screen recordings &mdash;
                 read-only window sharing does not exclude them from capture.

@@ -133,7 +133,7 @@ Light Up My Life combines a tiny [Metal](https://developer.apple.com/metal/) HDR
 
 The nits readout is `500 × brightness multiplier`, rounded to an integer. Click it to edit the level, or use the slider. The control range follows available EDR headroom and is capped at 3.2× (1,600 estimated nits); actual luminance depends on your display and macOS and is not measured by the app.
 
-Turning boost off or quitting normally restores the saved gamma tables. Wake and display changes rebuild the HDR windows and reapply the boost; the three-second watchdog only re-shows existing hidden windows, without rebuilding them. Displays without EDR support are skipped, and gamma is only changed when a table was successfully saved.
+Turning boost off or quitting normally restores the saved gamma tables. Wake and EDR display-layout changes rebuild the HDR windows and reapply the boost. Headroom-only changes reuse the existing windows and reapply gamma, avoiding rebuild-induced flicker during ordinary brightness changes. The three-second watchdog only re-shows existing hidden windows, without rebuilding them. Displays without EDR support are skipped, and gamma is only changed when a table was successfully saved.
 
 The seed windows ignore mouse events and are configured for all Spaces and fullscreen apps. They use `.readOnly` window sharing, so they can appear in screenshots or screen recordings; capture exclusion is not guaranteed.
 

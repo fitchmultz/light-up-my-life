@@ -103,7 +103,7 @@ final class BrightnessManager: ObservableObject {
             .sink { [weak self] _ in
                 self?.checkEDRSupport()
                 if let self = self, self.isEnabled {
-                    self.overlayManager.rebuildOverlays(brightness: self.brightnessMultiplier)
+                    self.overlayManager.refreshOverlays(brightness: self.brightnessMultiplier)
                 }
             }
             .store(in: &cancellables)
@@ -113,7 +113,7 @@ final class BrightnessManager: ObservableObject {
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self, self.isEnabled else { return }
-                self.overlayManager.rebuildOverlays(brightness: self.brightnessMultiplier)
+                self.overlayManager.showOverlays(brightness: self.brightnessMultiplier)
             }
             .store(in: &cancellables)
 
