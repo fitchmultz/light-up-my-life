@@ -142,7 +142,7 @@ The seed windows ignore mouse events and are configured for all Spaces and fulls
 <details>
 <summary><strong>Will this damage my display?</strong></summary>
 <br>
-No. The XDR display is designed to output up to 1,600 nits. Apple uses this range for HDR content regularly. We're just letting you use what you already have.
+The nits value is an estimate, not a safety guarantee. Use a comfortable level and disable boost if you see flashes or clipping.
 </details>
 
 <details>
